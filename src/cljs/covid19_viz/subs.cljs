@@ -13,6 +13,11 @@
    (:active-panel db)))
 
 (re-frame/reg-sub
+ ::covid19-data
+ (fn [db _]
+   (:covid19-data db)))
+
+(re-frame/reg-sub
  ::re-pressed-example
  (fn [db _]
    (:re-pressed-example db)))

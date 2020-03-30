@@ -1,9 +1,10 @@
 (ns covid19-viz.views
   (:require
    [re-frame.core :as re-frame]
+   [reagent.core :as r :refer [adapt-react-class]]
    [re-com.core :as re-com]
    [covid19-viz.subs :as subs]
-   ))
+   ["react-chartjs-2" :refer [Line]]))
 
 
 ;; home
@@ -41,7 +42,26 @@
               [display-re-pressed-example]
               ]])
 
+(defn country-table [country data]
+  [re-com/v-box
+   :children [[:div country]
+              [re-com/v-box
+               :gap "2em"
+               :children [[:> Line {:data {:labels (map :date data)
+                                           :datasets [{:label "Confirmed cases"
+                                                       :data (map :confirmed data)
+                                                       :borderColor "orange"}]}}]
+                          [:> Line {:data {:labels (map :date data)
+                                           :datasets [{:label "Deaths"
+                                                       :data (map :deaths data)
+                                                       :borderColor "red"}]}}]]]]])
 
+(defn covid19-table []
+  (let [data (re-frame/subscribe [::subs/covid19-data])]
+    [:div
+     [:h2 "Table"]
+     [:div (for [[country country-data] @data]
+             [country-table country country-data])]]))
 ;; about
 
 (defn about-title []
@@ -58,6 +78,7 @@
   [re-com/v-box
    :gap "1em"
    :children [[about-title]
+              [covid19-table]
               [link-to-home-page]]])
 
 
