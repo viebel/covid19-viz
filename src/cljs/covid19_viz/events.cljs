@@ -4,6 +4,7 @@
    [covid19-viz.db :as db]
    [day8.re-frame.http-fx]
    [ajax.core :as ajax]
+   [gadjett.collections :refer [map-object]]
    [day8.re-frame.tracing :refer-macros [fn-traced]]
    ))
 
@@ -22,10 +23,13 @@
                  :on-success      [::load-covid19-data-success]
                  :on-failure      [::load-covid19-data-failure]}}))
 
+(def skip-first-days 0)
 (re-frame/reg-event-db
  ::load-covid19-data-success
  (fn [db [_ result]]
-   (assoc db :covid19-data result)))
+   (assoc db
+          :covid19-data (map-object (partial drop skip-first-days) result)
+          :covid19-original-data result)))
 
 (re-frame/reg-event-db
  ::set-active-panel
@@ -36,3 +40,8 @@
  ::set-re-pressed-example
  (fn [db [_ value]]
    (assoc db :re-pressed-example value)))
+
+(re-frame/reg-event-db
+ ::select-country
+ (fn [db [_ value]]
+   (assoc-in db [:ui :selected-country] value)))

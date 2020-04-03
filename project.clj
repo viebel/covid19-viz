@@ -8,6 +8,7 @@
                  [reagent "0.9.1"]
                  [re-frame "0.11.0"]
                  [day8.re-frame/http-fx "v0.2.0"]
+                 [viebel/gadjett "0.5.13"]
                  [re-com "2.7.0"]
                  [secretary "1.2.3"]
                  [compojure "1.6.1"]
