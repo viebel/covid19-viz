@@ -41,6 +41,7 @@
               [link-to-about-page]
               [display-re-pressed-example]
               ]])
+
 (defn avg [& x]
   (let [y (remove nil? x)]
     (* 1.0
@@ -48,13 +49,24 @@
           (count y)))))
 
 (defn running-avg [days data]
-  (apply map avg
-         (concat [data]
-                 (map #(concat (repeat % nil) data) (range 1 days)))))
+  (concat [nil]
+          (apply map avg
+                 (concat [data]
+                         (map #(concat (repeat % nil) data) (range 1 days))))))
 
 (defn delta [x]
-  (map - (rest x)
-         x))
+  (concat [nil]
+          (map - (rest x)
+               x)))
+
+(defn safe-divide [a b]
+  (if (zero? b)
+    0
+    (float (/ a b))))
+
+(defn relative-growth [days data]
+  (concat (repeat days 0)
+          (map safe-divide (nth (iterate rest data) days) data)))
 
 (defn country-table [country data]
   [re-com/v-box
@@ -72,7 +84,7 @@
                                              :datasets [{:label "Death cases"
                                                          :data (map :deaths data)
                                                          :borderColor "red"}]}}]
-                          [:> Line {:data {:labels (rest (map :date data))
+                          [:> Line {:data {:labels (map :date data)
                                            :datasets [{:label "Confirmed cases - Delta"
                                                        :data (delta (map :confirmed data))
                                                        :borderColor "blue"}
@@ -82,9 +94,16 @@
                                                       {:label "Confirmed cases - Delta 7 days average"
                                                        :data (running-avg 7 (delta (map :confirmed data)))
                                                        :borderColor "green"}]}}]
+                          [:> Line {:data {:labels (map :date data)
+                                           :datasets [{:label "Confirmed cases - 3 days relative growth"
+                                                       :data (relative-growth 3 (map :confirmed data))
+                                                       :borderColor "blue"}
+                                                      {:label "Confirmed cases - 3 days relative growth 3 days average"
+                                                       :data (running-avg 7 (relative-growth 3 (map :confirmed data)))
+                                                       :borderColor "green"}]}}]
                           [:> Line {:height 500
                                       :width 1000
-                                      :data {:labels (rest (map :date data))
+                                    :data {:labels (map :date data)
                                            :datasets [{:label "Active cases - Delta"
                                                        :data (delta (map :active data))
                                                        :borderColor "blue"}
@@ -100,11 +119,6 @@
                                            :datasets [{:label "Deaths"
                                                        :data (map :deaths data)
                                                        :borderColor "red"}]}}]]]]])
-
-(defn running-average [days data]
-  (reduce (fn [[res last-vals] x])
-          [[] (repeat days nil)]
-          data))
 
 (defn select-country-ui []
   (let [countries @(re-frame/subscribe [::subs/covid19-countries])
@@ -131,44 +145,18 @@
 
 (defn covid19-all-countries []
   (let [data @(re-frame/subscribe [::subs/covid19-data-all])]
-    (println "data" data)
     [re-com/v-box
      :children [[:h2 "The Overall"]
                 [country-table "Overall" data]]]))
 
-(defn about-title []
-  [re-com/title
-   :label "This is the About Page."
-   :level :level1])
-
-(defn link-to-home-page []
-  [re-com/hyperlink-href
-   :label "go to Home Page"
-   :href "#/"])
-
-(defn about-panel []
+(defn covid19-data-ui []
   [re-com/v-box
    :gap "1em"
-   :children [[about-title]
-              [covid19-all-countries]
+   :children [[covid19-all-countries]
               [select-country-ui]
-              [covid19-table]
-              [link-to-home-page]]])
-
-
-;; main
-
-(defn- panels [panel-name]
-  (case panel-name
-    :home-panel [home-panel]
-    :about-panel [about-panel]
-    [:div]))
-
-(defn show-panel [panel-name]
-  [panels panel-name])
+              [covid19-table]]])
 
 (defn main-panel []
-  (let [active-panel (re-frame/subscribe [::subs/active-panel])]
-    [re-com/v-box
-     :height "100%"
-     :children [[panels @active-panel]]]))
+  [re-com/v-box
+   :height "100%"
+   :children [[covid19-data-ui]]])

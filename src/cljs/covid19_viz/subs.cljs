@@ -34,8 +34,6 @@
        first
        (map :date)))
 
-(defn country-data-date-field [date])
-
 (defn sum-fields [fields coll]
   (into {:date (:date (first coll))}
         (for [field fields]

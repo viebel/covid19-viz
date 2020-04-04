@@ -5,8 +5,7 @@
    [day8.re-frame.http-fx]
    [ajax.core :as ajax]
    [gadjett.collections :refer [map-object]]
-   [day8.re-frame.tracing :refer-macros [fn-traced]]
-   ))
+   [day8.re-frame.tracing :refer-macros [fn-traced]]))
 
 (re-frame/reg-event-db
  ::initialize-db
