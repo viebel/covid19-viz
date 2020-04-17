@@ -88,9 +88,6 @@
                                            :datasets [{:label "Confirmed cases - Delta"
                                                        :data (delta (map :confirmed data))
                                                        :borderColor "blue"}
-                                                      {:label "Confirmed cases - Delta 3 days average"
-                                                       :data (running-avg 3 (delta (map :confirmed data)))
-                                                       :borderColor "orange"}
                                                       {:label "Confirmed cases - Delta 7 days average"
                                                        :data (running-avg 7 (delta (map :confirmed data)))
                                                        :borderColor "green"}]}}]
@@ -98,8 +95,17 @@
                                            :datasets [{:label "Confirmed cases - 3 days relative growth"
                                                        :data (relative-growth 3 (map :confirmed data))
                                                        :borderColor "blue"}
-                                                      {:label "Confirmed cases - 3 days relative growth 3 days average"
+                                                      {:label "Confirmed cases - 3 days relative growth 7 days average"
                                                        :data (running-avg 7 (relative-growth 3 (map :confirmed data)))
+                                                       :borderColor "green"}]}}]
+                          [:> Line {:height 500
+                                    :width 1000
+                                    :data {:labels (map :date data)
+                                           :datasets [{:label "Death cases - Delta"
+                                                       :data (delta (map :deaths data))
+                                                       :borderColor "blue"}
+                                                      {:label "Death cases - Delta 7 days average"
+                                                       :data (running-avg 7 (delta (map :deaths data)))
                                                        :borderColor "green"}]}}]
                           [:> Line {:height 500
                                       :width 1000
@@ -107,9 +113,6 @@
                                            :datasets [{:label "Active cases - Delta"
                                                        :data (delta (map :active data))
                                                        :borderColor "blue"}
-                                                      {:label "Active cases - Delta 3 days average"
-                                                       :data (running-avg 3 (delta (map :active data)))
-                                                       :borderColor "orange"}
                                                       {:label "Active cases - Delta 7 days average"
                                                        :data (running-avg 7 (delta (map :active data)))
                                                        :borderColor "green"}]}}]
